@@ -1,0 +1,38 @@
+language: r
+dist: bionic
+cache: packages
+
+r_github_packages:
+  - richelbilderbeek/beautier
+  - richelbilderbeek/beastier
+  - richelbilderbeek/babette
+  - richelbilderbeek/mcbette
+  - thijsjanzen/nodeSub
+  - richelbilderbeek/pirouette
+
+before_install:
+  # ImageMagick
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo add-apt-repository -y ppa:opencpu/imagemagick; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -y libmagick++-dev; fi
+  # Rmpfr
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt install -qq libmpfr-dev; fi
+  # Java
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then R CMD javareconf; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then R --quiet -e 'install.packages("rJava", type="source", repos="http://cran.us.r-project.org")'; fi
+
+before_script:
+  - Rscript -e "beastier::install_beast2()"
+  - Rscript -e "mauricer::install_beast2_pkg(\"NS\")"
+
+script:
+  - travis_wait 60 ./scripts/rerun.sh
+
+after_success:
+  - Rscript -e "mcbette::mcbette_report()"
+  - find .
+
+after_failure:
+  - Rscript -e "mcbette::mcbette_report()"
+  - find .
+
