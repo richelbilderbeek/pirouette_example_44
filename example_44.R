@@ -12,7 +12,7 @@ library(ggplot2)
 example_no <- 44
 rng_seed <- 314
 crown_age <- 50
-n_phylogenies <- 10
+n_phylogenies <- 50
 folder_name <- paste0("example_", example_no)
 is_testing <- is_on_ci()
 if (is_testing) {
